@@ -2,20 +2,24 @@ from flask import Flask
 from threading import Thread
 import telebot
 from telebot import types
+import yt_dlp
+import requests
+import random
+import qrcode
+from io import BytesIO
+import os
 
 # ================= SETTINGS =================
 
 TOKEN = "8819285435:AAH10iB7jzjKTHh5QL4vzPZGI9OYH7o4NCo"
-
 ADMIN_ID = 7547763921
+
+OWNER_NAME = "DEATH DREAM"
 
 CHANNEL_USERNAME = "HACKERQUEEN9"
 
 TELEGRAM_LINK = "https://t.me/HACKERQUEEN9"
-
 WHATSAPP_LINK = "https://whatsapp.com/channel/0029Vb7MViI0VycACP8CUI32"
-
-OWNER_NAME = "DEATH DREAM"
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -27,8 +31,10 @@ app = Flask(__name__)
 def home():
     return "VOIDXDOWNLOADER BOT RUNNING"
 
+
 def run():
     app.run(host='0.0.0.0', port=8080)
+
 
 def keep_alive():
     t = Thread(target=run)
@@ -93,7 +99,11 @@ def start(message):
 
 👑 OWNER : {OWNER_NAME}
 
-⚡ FAST VIDEO DOWNLOADER
+⚡ VIDEO DOWNLOADER
+⚡ PASSWORD GENERATOR
+⚡ QR GENERATOR
+⚡ WEATHER TOOL
+⚡ CRYPTO TOOL
 
 📢 TELEGRAM :
 {TELEGRAM_LINK}
@@ -129,7 +139,9 @@ def channel(message):
 
     bot.reply_to(
         message,
-        f"📢 TELEGRAM : {TELEGRAM_LINK}\n\n💬 WHATSAPP : {WHATSAPP_LINK}"
+        f"📢 TELEGRAM : {TELEGRAM_LINK}
+
+💬 WHATSAPP : {WHATSAPP_LINK}"
     )
 
 # ================= STATUS =================
@@ -142,25 +154,113 @@ def status(message):
         "✅ BOT ONLINE AND WORKING"
     )
 
-# ================= DOWNLOAD =================
+# ================= PASSWORD =================
 
-@bot.message_handler(func=lambda m: m.text == "📥 DOWNLOAD")
-def download(message):
+@bot.message_handler(commands=['password'])
+def password(message):
 
-    bot.reply_to(
-        message,
-        "📥 SEND VIDEO LINK"
-    )
+    chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#"
 
-# ================= LINK DETECT =================
+    pwd = ''.join(random.choice(chars) for _ in range(12))
 
-@bot.message_handler(func=lambda m: "http" in m.text)
-def links(message):
+    bot.reply_to(message, f"🔐 PASSWORD:
+{pwd}")
 
-    bot.reply_to(
-        message,
-        "⚡ VIDEO DOWNLOADER COMING SOON\n\n🔥 POWERED BY DARK HACKER ZONE"
-    )
+# ================= QR =================
+
+@bot.message_handler(commands=['qr'])
+def qr(message):
+
+    try:
+        text = message.text.replace('/qr ', '')
+
+        img = qrcode.make(text)
+
+        bio = BytesIO()
+        bio.name = 'qr.png'
+
+        img.save(bio, 'PNG')
+
+        bio.seek(0)
+
+        bot.send_photo(message.chat.id, bio)
+
+    except:
+        bot.reply_to(message, "Usage: /qr your text")
+
+# ================= WEATHER =================
+
+@bot.message_handler(commands=['weather'])
+def weather(message):
+
+    try:
+        city = message.text.split()[1]
+
+        data = requests.get(f'https://wttr.in/{city}?format=3').text
+
+        bot.reply_to(message, data)
+
+    except:
+        bot.reply_to(message, "Usage: /weather karachi")
+
+# ================= PING =================
+
+@bot.message_handler(commands=['ping'])
+def ping(message):
+
+    bot.reply_to(message, "🏓 BOT ONLINE")
+
+# ================= CRYPTO =================
+
+@bot.message_handler(commands=['crypto'])
+def crypto(message):
+
+    try:
+        coin = message.text.split()[1].lower()
+
+        url = f'https://api.coingecko.com/api/v3/simple/price?ids={coin}&vs_currencies=usd'
+
+        data = requests.get(url).json()
+
+        price = data[coin]['usd']
+
+        bot.reply_to(message, f'💰 {coin.upper()} PRICE : ${price}')
+
+    except:
+        bot.reply_to(message, 'Usage: /crypto bitcoin')
+
+# ================= VIDEO DOWNLOADER =================
+
+@bot.message_handler(func=lambda m: m.text.startswith("http"))
+def downloader(message):
+
+    url = message.text
+
+    bot.reply_to(message, "⏳ DOWNLOADING VIDEO PLEASE WAIT...")
+
+    try:
+
+        ydl_opts = {
+            'format': 'mp4',
+            'outtmpl': '%(title)s.%(ext)s'
+        }
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            filename = ydl.prepare_filename(info)
+
+        with open(filename, 'rb') as video:
+            bot.send_video(
+                message.chat.id,
+                video,
+                caption="🔥 POWERED BY DARK HACKER ZONE 🔥"
+            )
+
+        os.remove(filename)
+
+    except Exception as e:
+
+        bot.reply_to(message, f"❌ ERROR : {e}")
 
 # ================= ADMIN =================
 
@@ -170,10 +270,7 @@ def admin(message):
     if message.from_user.id != ADMIN_ID:
         return
 
-    bot.reply_to(
-        message,
-        "👑 ADMIN PANEL ACTIVE"
-    )
+    bot.reply_to(message, "👑 ADMIN PANEL ACTIVE")
 
 # ================= START BOT =================
 
