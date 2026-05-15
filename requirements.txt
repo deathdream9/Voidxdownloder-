@@ -1,6 +1,2 @@
 pyTelegramBotAPI
 flask
-requests
-yt-dlp
-qrcode
-pillow
