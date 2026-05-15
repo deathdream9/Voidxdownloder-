@@ -1,9 +1,9 @@
 from flask import Flask
-
 from threading import Thread
 import telebot
 
 TOKEN = "8819285435:AAH10iB7jzjKTHh5QL4vzPZGI9OYH7o4NCo"
+ADMIN_ID = 7547763921
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -22,7 +22,10 @@ def keep_alive():
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.reply_to(message, "🔥 VOIDXDOWNLOADER WORKING")
+    if message.chat.id == ADMIN_ID:
+        bot.reply_to(message, "🔥 VOIDXDOWNLOADER WORKING")
+    else:
+        bot.reply_to(message, "✅ Bot Online Hai")
 
 keep_alive()
 
