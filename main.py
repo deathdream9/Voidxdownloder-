@@ -1,4 +1,5 @@
-    from flask import Flask
+from flask import flask
+
 from threading import Thread
 import telebot
 
