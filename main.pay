@@ -50,35 +50,7 @@ def check_join(user_id):
             return True
 
     except:
-        return False
-
-# ================= START =================
-
-@bot.message_handler(commands=['start'])
-def start(message):
-
-    user_id = message.from_user.id
-
-    if not check_join(user_id):
-
-        markup = types.InlineKeyboardMarkup()
-
-        btn1 = types.InlineKeyboardButton(
-            "📢 JOIN TELEGRAM",
-            url=TELEGRAM_LINK
-        )
-
-        btn2 = types.InlineKeyboardButton(
-            "💬 JOIN WHATSAPP",
-            url=WHATSAPP_LINK
-        )
-
-        markup.add(btn1)
-        markup.add(btn2)
-
-        bot.reply_to(
-            message,
-            "⚠️ FIRST JOIN CHANNELS TO USE BOT",
+     JOIN CHANNELS TO USE BOT",
             reply_markup=markup
         )
 
@@ -95,97 +67,6 @@ def start(message):
     menu.add(b3, b4)
 
     text = f"""
-🔥 WELCOME TO VOIDXDOWNLOADER 🔥
-
-👑 OWNER : {OWNER_NAME}
-
-⚡ VIDEO DOWNLOADER
-⚡ PASSWORD GENERATOR
-⚡ QR GENERATOR
-⚡ WEATHER TOOL
-⚡ CRYPTO TOOL
-
-📢 TELEGRAM :
-{TELEGRAM_LINK}
-
-💬 WHATSAPP :
-{WHATSAPP_LINK}
-
-SEND VIDEO LINK TO DOWNLOAD
-
-🔥 POWERED BY DARK HACKER ZONE
-"""
-
-    bot.send_message(
-        message.chat.id,
-        text,
-        reply_markup=menu
-    )
-
-# ================= OWNER =================
-
-@bot.message_handler(func=lambda m: m.text == "👑 OWNER")
-def owner(message):
-
-    bot.reply_to(
-        message,
-        f"👑 OWNER NAME : {OWNER_NAME}"
-    )
-
-# ================= CHANNEL =================
-
-@bot.message_handler(func=lambda m: m.text == "📢 CHANNEL")
-def channel(message):
-
-    bot.reply_to(
-        message,
-        f"📢 TELEGRAM : {TELEGRAM_LINK}
-
-💬 WHATSAPP : {WHATSAPP_LINK}"
-    )
-
-# ================= STATUS =================
-
-@bot.message_handler(func=lambda m: m.text == "⚡ STATUS")
-def status(message):
-
-    bot.reply_to(
-        message,
-        "✅ BOT ONLINE AND WORKING"
-    )
-
-# ================= PASSWORD =================
-
-@bot.message_handler(commands=['password'])
-def password(message):
-
-    chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#"
-
-    pwd = ''.join(random.choice(chars) for _ in range(12))
-
-    bot.reply_to(message, f"🔐 PASSWORD:
-{pwd}")
-
-# ================= QR =================
-
-@bot.message_handler(commands=['qr'])
-def qr(message):
-
-    try:
-        text = message.text.replace('/qr ', '')
-
-        img = qrcode.make(text)
-
-        bio = BytesIO()
-        bio.name = 'qr.png'
-
-        img.save(bio, 'PNG')
-
-        bio.seek(0)
-
-        bot.send_photo(message.chat.id, bio)
-
-    except:
         bot.reply_to(message, "Usage: /qr your text")
 
 # ================= WEATHER =================
